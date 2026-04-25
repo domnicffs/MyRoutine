@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Grind — Routine Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: #111118;
+  --surface2: #1a1a24;
+  --border: #2a2a3a;
+  --accent: #c8f03c;
+  --accent2: #7b5ea7;
+  --accent3: #f03c6e;
+  --text: #f0f0f8;
+  --muted: #6b6b88;
+  --gold: #ffd700;
+  --done: #3cf08a;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Syne', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* NOISE OVERLAY */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.4;
+}
+
+/* HEADER */
+header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(10,10,15,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.75rem 1.25rem;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.logo { font-family: 'Space Mono', monospace; font-size: 13px; color: var(--accent); letter-spacing: 0.05em; }
+.header-right { display: flex; align-items: center; gap: 12px; }
+.xp-badge {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gold);
+  font-family: 'Space Mono', monospace;
+}
+.streak-badge {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent3);
+  font-family: 'Space Mono', monospace;
+}
+.reset-btn {
+  background: none; border: 1px solid var(--border);
+  color: var(--muted); font-size: 11px; font-family: 'Space Mono', monospace;
+  padding: 4px 10px; border-radius: 6px; cursor: pointer;
+  transition: all 0.15s;
+}
+.reset-btn:hover { border-color: var(--accent3); color: var(--accent3); }
+
+.reset-overlay {
+  display: none; position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,0.7); align-items: center; justify-content: center;
+}
+.reset-overlay.show { display: flex; }
+.reset-modal {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 16px; padding: 1.5rem; max-width: 300px; width: 90%; text-align: center;
+}
+.reset-modal-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+.reset-modal-sub { font-size: 13px; color: var(--muted); margin-bottom: 1.25rem; line-height: 1.5; }
+.reset-modal-btns { display: flex; gap: 8px; }
+.reset-confirm { flex: 1; padding: 10px; border-radius: 8px; border: none; background: var(--accent3); color: #fff; font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; }
+.reset-cancel { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface2); color: var(--text); font-family: 'Syne', sans-serif; font-size: 14px; cursor: pointer; }
+
+/* MAIN */
+main { position: relative; z-index: 1; padding: 1.25rem; max-width: 480px; margin: 0 auto; }
+
+/* DAY PILL TABS */
+.day-nav {
+  display: flex; gap: 6px; margin-bottom: 1.25rem;
+  overflow-x: auto; padding-bottom: 4px;
+  scrollbar-width: none;
+}
+.day-nav::-webkit-scrollbar { display: none; }
+.day-pill {
+  flex-shrink: 0;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all 0.15s;
+  position: relative;
+}
+.day-pill.active { background: var(--accent); color: #000; border-color: var(--accent); }
+.day-pill .day-dot {
+  position: absolute; top: 4px; right: 4px;
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--done); display: none;
+}
+.day-pill.has-progress .day-dot { display: block; }
+
+/* TODAY HERO */
+.today-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+.today-label { font-size: 11px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; font-family: 'Space Mono', monospace; margin-bottom: 4px; }
+.today-day { font-size: 28px; font-weight: 800; line-height: 1; margin-bottom: 8px; }
+.progress-wrap { background: var(--surface2); border-radius: 4px; height: 6px; overflow: hidden; margin-bottom: 6px; }
+.progress-bar { height: 100%; background: var(--accent); border-radius: 4px; transition: width 0.4s ease; }
+.progress-label { font-size: 11px; color: var(--muted); font-family: 'Space Mono', monospace; display: flex; justify-content: space-between; }
+
+/* XP POPUP */
+@keyframes xpPop {
+  0% { opacity: 0; transform: translateY(0) scale(0.8); }
+  20% { opacity: 1; transform: translateY(-20px) scale(1.1); }
+  80% { opacity: 1; transform: translateY(-30px) scale(1); }
+  100% { opacity: 0; transform: translateY(-50px) scale(0.9); }
+}
+.xp-popup {
+  position: fixed;
+  pointer-events: none;
+  font-family: 'Space Mono', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gold);
+  z-index: 9999;
+  animation: xpPop 1s ease forwards;
+}
+
+/* TASKS */
+.section-label {
+  font-size: 11px; color: var(--muted); letter-spacing: 0.1em;
+  text-transform: uppercase; font-family: 'Space Mono', monospace;
+  margin: 1.25rem 0 0.6rem;
+}
+.task-list { display: flex; flex-direction: column; gap: 8px; }
+.task {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+  display: flex; align-items: flex-start; gap: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+.task::before {
+  content: '';
+  position: absolute; left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--task-color, var(--accent2));
+  border-radius: 3px 0 0 3px;
+}
+.task:active { transform: scale(0.98); }
+.task.done {
+  background: rgba(60,240,138,0.04);
+  border-color: rgba(60,240,138,0.2);
+}
+.task.done .task-title { text-decoration: line-through; color: var(--muted); }
+.task.done .task-time { color: var(--muted); }
+
+.task-check {
+  width: 22px; height: 22px; border-radius: 6px;
+  border: 1.5px solid var(--border);
+  background: var(--surface2);
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+  margin-top: 1px;
+}
+.task.done .task-check {
+  background: var(--done);
+  border-color: var(--done);
+}
+.task-check svg { display: none; }
+.task.done .task-check svg { display: block; }
+
+.task-body { flex: 1; min-width: 0; }
+.task-time { font-size: 11px; color: var(--accent); font-family: 'Space Mono', monospace; margin-bottom: 2px; }
+.task-title { font-size: 14px; font-weight: 600; line-height: 1.3; }
+.task-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+.task-xp {
+  font-size: 11px; font-family: 'Space Mono', monospace;
+  color: var(--gold); font-weight: 700; flex-shrink: 0;
+  padding: 2px 7px; background: rgba(255,215,0,0.08);
+  border-radius: 10px; border: 1px solid rgba(255,215,0,0.2);
+  margin-top: 2px;
+}
+
+/* ALL DONE BANNER */
+.all-done {
+  background: linear-gradient(135deg, rgba(60,240,138,0.1), rgba(200,240,60,0.08));
+  border: 1px solid rgba(60,240,138,0.3);
+  border-radius: 12px;
+  padding: 1rem; text-align: center;
+  margin-top: 1rem; display: none;
+}
+.all-done.show { display: block; }
+.all-done-title { font-size: 20px; font-weight: 800; color: var(--done); }
+.all-done-sub { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+/* LEADERBOARD / LEVEL */
+.level-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 12px;
+}
+.level-icon {
+  width: 44px; height: 44px; border-radius: 10px;
+  background: var(--surface2); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; flex-shrink: 0;
+}
+.level-info { flex: 1; }
+.level-name { font-size: 15px; font-weight: 700; }
+.level-sub { font-size: 11px; color: var(--muted); font-family: 'Space Mono', monospace; }
+.level-xp-wrap { background: var(--surface2); border-radius: 4px; height: 4px; margin-top: 6px; overflow: hidden; }
+.level-xp-bar { height: 100%; background: var(--accent2); border-radius: 4px; transition: width 0.4s; }
+
+/* ANIM */
+@keyframes checkBounce {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+.task.just-done .task-check { animation: checkBounce 0.3s ease; }
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">DAILY_GRIND.exe</div>
+  <div class="header-right">
+    <div class="streak-badge" id="streak-badge">🔥 0</div>
+    <div class="xp-badge" id="xp-badge">0 XP</div>
+    <button class="reset-btn" onclick="confirmReset()">reset</button>
+  </div>
+</header>
+
+<main>
+  <div class="level-card" id="level-card">
+    <div class="level-icon" id="level-icon">🌱</div>
+    <div class="level-info">
+      <div class="level-name" id="level-name">Rookie</div>
+      <div class="level-sub" id="level-sub">0 / 200 XP to next level</div>
+      <div class="level-xp-wrap"><div class="level-xp-bar" id="level-bar" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <div id="quote-card" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:0.9rem 1rem;margin-bottom:1.25rem;border-left:3px solid var(--accent2);">
+    <div style="font-size:11px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;font-family:'Space Mono',monospace;margin-bottom:6px;">today's fuel</div>
+    <div id="quote-text" style="font-size:13px;color:var(--text);font-style:italic;line-height:1.5;"></div>
+    <div id="quote-author" style="font-size:11px;color:var(--accent);font-family:'Space Mono',monospace;margin-top:5px;"></div>
+  </div>
+
+  <div class="day-nav" id="day-nav"></div>
+
+  <div class="today-card">
+    <div class="today-label">Today's grind</div>
+    <div class="today-day" id="today-day-name">Monday</div>
+    <div class="progress-wrap"><div class="progress-bar" id="progress-bar" style="width:0%"></div></div>
+    <div class="progress-label">
+      <span id="done-count">0 done</span>
+      <span id="total-count">0 tasks</span>
+    </div>
+  </div>
+
+  <div id="tasks-container"></div>
+  <div class="all-done" id="all-done">
+    <div class="all-done-title">DAY COMPLETE 🏆</div>
+    <div class="all-done-sub" id="all-done-sub">You earned XP today. Keep the streak going.</div>
+  </div>
+</main>
+
+<div class="reset-overlay" id="reset-overlay">
+  <div class="reset-modal">
+    <div class="reset-modal-title">Reset everything?</div>
+    <div class="reset-modal-sub">This will wipe all your XP, streak and ticked tasks. Cannot be undone.</div>
+    <div class="reset-modal-btns">
+      <button class="reset-cancel" onclick="closeReset()">Cancel</button>
+      <button class="reset-confirm" onclick="doReset()">Reset</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+const CATEGORIES = {
+  hygiene:  { color: '#5DCAA5', label: 'Hygiene' },
+  trading:  { color: '#7b5ea7', label: 'Trading' },
+  food:     { color: '#EF9F27', label: 'Food' },
+  prep:     { color: '#85B7EB', label: 'Prep' },
+  work:     { color: '#4a9af5', label: 'Work' },
+  workout:  { color: '#97C459', label: 'Workout' },
+  reading:  { color: '#F0997B', label: 'Reading' },
+  chores:   { color: '#B4B2A9', label: 'Chores' },
+  anime:    { color: '#ED93B1', label: 'Chill' },
+  haircare: { color: '#c8f03c', label: 'Hair care' },
+  shopping: { color: '#f03c6e', label: 'Shopping' },
+};
+
+// XP per task
+const XP_TASK = 10;
+const XP_BONUS_ALL = 50;
+
+const QUOTES = [
+  { text: "Discipline is choosing between what you want now and what you want most.", author: "Abraham Lincoln" },
+  { text: "We are what we repeatedly do. Excellence, then, is not an act but a habit.", author: "Aristotle" },
+  { text: "The secret of your future is hidden in your daily routine.", author: "Mike Murdock" },
+  { text: "Small disciplines repeated with consistency every day lead to great achievements.", author: "John C. Maxwell" },
+  { text: "You don't rise to the level of your goals. You fall to the level of your systems.", author: "James Clear" },
+  { text: "Success is nothing more than a few simple disciplines practiced every day.", author: "Jim Rohn" },
+  { text: "The pain of discipline is far less than the pain of regret.", author: "Sarah Bombell" },
+  { text: "Either you run the day or the day runs you.", author: "Jim Rohn" },
+  { text: "Motivation gets you started. Habit keeps you going.", author: "Jim Ryun" },
+  { text: "Don't wish it were easier. Wish you were better.", author: "Jim Rohn" },
+  { text: "It's not about having time. It's about making time.", author: "Unknown" },
+  { text: "The man who moves a mountain begins by carrying away small stones.", author: "Confucius" },
+  { text: "Champions aren't made in gyms. Champions are made from something inside them — a desire, a dream, a vision.", author: "Muhammad Ali" },
+  { text: "You have to be willing to do the things today that others won't do, to have the things tomorrow others won't have.", author: "Les Brown" },
+  { text: "Hard work beats talent when talent doesn't work hard.", author: "Tim Notke" },
+  { text: "The difference between who you are and who you want to be is what you do.", author: "Unknown" },
+  { text: "Consistency is what transforms average into excellence.", author: "Unknown" },
+  { text: "Wake up with determination. Go to bed with satisfaction.", author: "Unknown" },
+  { text: "Don't count the days, make the days count.", author: "Muhammad Ali" },
+  { text: "The grind never stops — and that's the point.", author: "Unknown" },
+  { text: "Your future self is watching you right now through your memories.", author: "Aubrey Marcus" },
+  { text: "Do what is hard and your life will be easy. Do what is easy and your life will be hard.", author: "Les Brown" },
+  { text: "One day or day one. You decide.", author: "Unknown" },
+  { text: "Every morning you have two choices: continue to sleep with your dreams, or wake up and chase them.", author: "Unknown" },
+  { text: "The only bad workout is the one that didn't happen.", author: "Unknown" },
+  { text: "Stop wishing, start doing.", author: "Unknown" },
+  { text: "Progress is progress, no matter how small.", author: "Unknown" },
+  { text: "Your body can stand almost anything. It's your mind you have to convince.", author: "Unknown" },
+  { text: "Show up every day, not just on the days you feel like it.", author: "Unknown" },
+  { text: "Be stronger than your strongest excuse.", author: "Unknown" },
+];
+
+function renderQuote() {
+  const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+  const q = QUOTES[dayOfYear % QUOTES.length];
+  document.getElementById('quote-text').textContent = '"' + q.text + '"';
+  document.getElementById('quote-author').textContent = '— ' + q.author;
+}
+
+// Schedule: 0=Sun,1=Mon,...,6=Sat
+const SCHEDULE = {
+  1: [ // Monday
+    { time:'10:00 – 10:10', title:'Wake up & relax', sub:'Lay still for 5 mins, then open curtains and sit for 5 mins', cat:'hygiene', xp:10 },
+    { time:'10:10 – 10:40', title:'Hygiene', sub:'Brush, floss, face wash', cat:'hygiene', xp:15 },
+    { time:'10:40', title:'Market review', sub:'Wait for the right confluences before entry — follow the plan', cat:'trading', xp:15 },
+    { time:'11:30', title:'Make food & eat', sub:'Eat and relax', cat:'food', xp:10 },
+    { time:'12:15', title:'Iron clothes & get ready', sub:'Check traffic before leaving', cat:'prep', xp:10 },
+    { time:'14:00', title:'Work', sub:'2pm – 7pm shift', cat:'work', xp:20 },
+    { time:'19:45', title:'Change & freshen up', sub:'Get out of work mode', cat:'hygiene', xp:5 },
+    { time:'20:00', title:'Workout', sub:"If it's easy, every mfer will be doing it", cat:'workout', xp:20 },
+    { time:'21:15', title:'Eat & watch anime', sub:'Chill post-workout meal', cat:'anime', xp:10 },
+    { time:'22:00', title:'Read', sub:'At least 20 mins — one book a month', cat:'reading', xp:15 },
+    { time:'23:00', title:'Night hygiene', sub:'Brush and floss before bed', cat:'hygiene', xp:10 },
+  ],
+  2: [ // Tuesday
+    { time:'10:00 – 10:10', title:'Wake up & relax', sub:'Lay still for 5 mins, then open curtains and sit for 5 mins', cat:'hygiene', xp:10 },
+    { time:'10:10 – 10:40', title:'Hygiene', sub:'Brush, floss, face wash', cat:'hygiene', xp:15 },
+    { time:'10:40', title:'Market review', sub:'Wait for the right confluences before entry — follow the plan', cat:'trading', xp:15 },
+    { time:'11:30', title:'Make food & eat', sub:'Eat and relax', cat:'food', xp:10 },
+    { time:'12:15', title:'Iron clothes & get ready', sub:'Check traffic before leaving', cat:'prep', xp:10 },
+    { time:'14:00', title:'Work', sub:'2pm – 7pm shift', cat:'work', xp:20 },
+    { time:'19:45', title:'Change & freshen up', sub:'', cat:'hygiene', xp:5 },
+    { time:'20:00', title:'Eat & watch anime', sub:'Rest day from gym', cat:'anime', xp:10 },
+    { time:'21:00', title:'Read', sub:'20+ mins', cat:'reading', xp:15 },
+    { time:'23:00', title:'Night hygiene', sub:'Brush and floss before bed', cat:'hygiene', xp:10 },
+  ],
+  3: [ // Wednesday
+    { time:'10:00 – 10:10', title:'Wake up & relax', sub:'Lay still for 5 mins, then open curtains and sit for 5 mins', cat:'hygiene', xp:10 },
+    { time:'10:10', title:'Hair oil', sub:'Massage oil into hair — let it marinate', cat:'haircare', xp:10 },
+    { time:'10:10 – 10:40', title:'Hygiene', sub:'Brush, floss, face wash', cat:'hygiene', xp:10 },
+    { time:'10:40', title:'Market review', sub:'Wait for the right confluences before entry — follow the plan', cat:'trading', xp:15 },
+    { time:'11:15', title:'Shower', sub:'Wash the oil out', cat:'hygiene', xp:10 },
+    { time:'11:45', title:'Make food & eat', sub:'Eat and relax', cat:'food', xp:10 },
+    { time:'12:15', title:'Iron clothes & get ready', sub:'Check traffic before leaving', cat:'prep', xp:10 },
+    { time:'14:00', title:'Work', sub:'2pm – 7pm shift', cat:'work', xp:20 },
+    { time:'19:45', title:'Change & freshen up', sub:'', cat:'hygiene', xp:5 },
+    { time:'20:00', title:'Workout', sub:"If it's easy, every mfer will be doing it", cat:'workout', xp:20 },
+    { time:'21:15', title:'Eat & watch anime', sub:'Post-workout meal', cat:'anime', xp:10 },
+    { time:'22:00', title:'Read', sub:'20+ mins', cat:'reading', xp:15 },
+    { time:'23:00', title:'Night hygiene', sub:'Brush and floss before bed', cat:'hygiene', xp:10 },
+  ],
+  4: [ // Thursday
+    { time:'10:00 – 10:10', title:'Wake up & relax', sub:'Lay still for 5 mins, then open curtains and sit for 5 mins', cat:'hygiene', xp:10 },
+    { time:'10:10 – 10:40', title:'Hygiene', sub:'Brush, floss, face wash', cat:'hygiene', xp:15 },
+    { time:'10:40', title:'Market review', sub:'Wait for the right confluences before entry — follow the plan', cat:'trading', xp:15 },
+    { time:'11:30', title:'Make food & eat', sub:'Eat and relax', cat:'food', xp:10 },
+    { time:'12:15', title:'Iron clothes & get ready', sub:'Check traffic before leaving', cat:'prep', xp:10 },
+    { time:'14:00', title:'Work', sub:'2pm – 7pm shift', cat:'work', xp:20 },
+    { time:'19:45', title:'Change & freshen up', sub:'', cat:'hygiene', xp:5 },
+    { time:'20:00', title:'Eat & watch anime', sub:'Rest day from gym', cat:'anime', xp:10 },
+    { time:'21:00', title:'Read', sub:'20+ mins', cat:'reading', xp:15 },
+    { time:'23:00', title:'Night hygiene', sub:'Brush and floss before bed', cat:'hygiene', xp:10 },
+  ],
+  5: [ // Friday
+    { time:'10:00 – 10:10', title:'Wake up & relax', sub:'Lay still for 5 mins, then open curtains and sit for 5 mins', cat:'hygiene', xp:10 },
+    { time:'10:10 – 10:40', title:'Hygiene', sub:'Brush, floss, face wash', cat:'hygiene', xp:15 },
+    { time:'10:40', title:'Market review', sub:'Wait for the right confluences before entry — follow the plan', cat:'trading', xp:15 },
+    { time:'11:30', title:'Make food & eat', sub:'Eat and relax', cat:'food', xp:10 },
+    { time:'12:15', title:'Iron clothes & get ready', sub:'Check traffic before leaving', cat:'prep', xp:10 },
+    { time:'14:00', title:'Work', sub:'2pm – 7pm shift', cat:'work', xp:20 },
+    { time:'19:45', title:'Change & freshen up', sub:'', cat:'hygiene', xp:5 },
+    { time:'20:00', title:'Workout', sub:"If it's easy, every mfer will be doing it", cat:'workout', xp:20 },
+    { time:'21:15', title:'Eat & watch anime', sub:'', cat:'anime', xp:10 },
+    { time:'22:00', title:'Read', sub:'20+ mins', cat:'reading', xp:15 },
+    { time:'23:00', title:'Night hygiene', sub:'Brush and floss before bed', cat:'hygiene', xp:10 },
+  ],
+  6: [ // Saturday
+    { time:'10:00 – 10:10', title:'Wake up & relax', sub:'Lay still for 5 mins, then open curtains and sit for 5 mins', cat:'hygiene', xp:10 },
+    { time:'10:10', title:'Laundry', sub:'Throw clothes in the washing machine', cat:'chores', xp:10 },
+    { time:'10:20 – 10:50', title:'Hygiene', sub:'Brush, floss, face wash', cat:'hygiene', xp:10 },
+    { time:'10:50', title:'Clean room', sub:'Tidy up properly', cat:'chores', xp:15 },
+    { time:'11:45', title:'Make food & eat', sub:'Eat and relax', cat:'food', xp:10 },
+    { time:'12:30', title:'Go grocery shopping', sub:'Get the week sorted', cat:'shopping', xp:15 },
+    { time:'~14:00', title:'Move laundry to dryer', sub:'2–3 hrs after washing machine started', cat:'chores', xp:10 },
+    { time:'14:15', title:'Clean the car', sub:'Back from shopping — car next', cat:'chores', xp:15 },
+    { time:'15:00', title:'Workout', sub:"If it's easy, every mfer will be doing it", cat:'workout', xp:20 },
+    { time:'16:30', title:'Eat & watch something', sub:'', cat:'anime', xp:10 },
+    { time:'18:00', title:'Read', sub:'Longer session if you want', cat:'reading', xp:15 },
+    { time:'23:00', title:'Night hygiene', sub:'Brush and floss before bed', cat:'hygiene', xp:10 },
+  ],
+  0: [ // Sunday
+    { time:'10:00 – 10:10', title:'Wake up & relax', sub:'Lay still for 5 mins, then open curtains and sit for 5 mins', cat:'hygiene', xp:10 },
+    { time:'10:10', title:'Hair oil', sub:'Apply and massage in — marinates all day until evening', cat:'haircare', xp:10 },
+    { time:'10:10 – 10:40', title:'Hygiene', sub:'Brush, floss, face wash', cat:'hygiene', xp:10 },
+    { time:'10:40', title:'Market review', sub:'Wait for the right confluences before entry — follow the plan', cat:'trading', xp:20 },
+    { time:'12:00', title:'Make food & eat', sub:'Eat and relax', cat:'food', xp:10 },
+    { time:'13:00', title:'Read', sub:'Afternoon reading session', cat:'reading', xp:15 },
+    { time:'19:00', title:'Shower', sub:'Wash the oil out — hair done', cat:'hygiene', xp:15 },
+    { time:'20:00', title:'Eat & wind down', sub:'Week preview — check economic calendar', cat:'anime', xp:10 },
+    { time:'23:00', title:'Night hygiene', sub:'Brush and floss before bed', cat:'hygiene', xp:10 },
+  ],
+};
+
+// LEVELS
+const LEVELS = [
+  { name:'Rookie', icon:'🌱', min:0, max:200 },
+  { name:'Grinder', icon:'⚡', min:200, max:500 },
+  { name:'Disciplined', icon:'🔥', min:500, max:1000 },
+  { name:'Focused', icon:'🎯', min:1000, max:2000 },
+  { name:'Locked In', icon:'💎', min:2000, max:3500 },
+  { name:'Elite', icon:'👑', min:3500, max:9999 },
+];
+
+// STATE
+function loadState() {
+  try { return JSON.parse(localStorage.getItem('dg_state') || '{}'); } catch { return {}; }
+}
+function saveState(s) { localStorage.setItem('dg_state', JSON.stringify(s)); }
+
+let state = loadState();
+if (!state.xp) state.xp = 0;
+if (!state.streak) state.streak = 0;
+if (!state.lastDay) state.lastDay = null;
+if (!state.done) state.done = {};
+
+let currentDay = new Date().getDay();
+
+function getTodayKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+}
+
+function isTaskDone(dayIdx, taskIdx) {
+  const key = `${dayIdx}`;
+  if (!state.done[key]) return false;
+  return !!state.done[key][taskIdx];
+}
+
+function setTaskDone(dayIdx, taskIdx, val) {
+  const key = `${dayIdx}`;
+  if (!state.done[key]) state.done[key] = {};
+  state.done[key][taskIdx] = val;
+}
+
+function getDayTasks(dayIdx) {
+  return SCHEDULE[dayIdx] || [];
+}
+
+function getDayProgress(dayIdx) {
+  const tasks = getDayTasks(dayIdx);
+  if (!tasks.length) return { done: 0, total: 0 };
+  let done = 0;
+  tasks.forEach((_, i) => { if (isTaskDone(dayIdx, i)) done++; });
+  return { done, total: tasks.length };
+}
+
+function getLevel(xp) {
+  for (let i = LEVELS.length - 1; i >= 0; i--) {
+    if (xp >= LEVELS[i].min) return i;
+  }
+  return 0;
+}
+
+function renderHeader() {
+  document.getElementById('xp-badge').textContent = state.xp + ' XP';
+  document.getElementById('streak-badge').textContent = '🔥 ' + state.streak;
+
+  const lvlIdx = getLevel(state.xp);
+  const lvl = LEVELS[lvlIdx];
+  const nextLvl = LEVELS[Math.min(lvlIdx + 1, LEVELS.length - 1)];
+  const progress = lvlIdx === LEVELS.length - 1 ? 100 :
+    Math.round(((state.xp - lvl.min) / (nextLvl.min - lvl.min)) * 100);
+
+  document.getElementById('level-icon').textContent = lvl.icon;
+  document.getElementById('level-name').textContent = lvl.name;
+  document.getElementById('level-sub').textContent =
+    lvlIdx < LEVELS.length - 1
+      ? `${state.xp} / ${nextLvl.min} XP to ${nextLvl.name}`
+      : `MAX LEVEL — ${state.xp} XP`;
+  document.getElementById('level-bar').style.width = progress + '%';
+}
+
+function renderDayNav() {
+  const nav = document.getElementById('day-nav');
+  nav.innerHTML = '';
+  for (let i = 0; i < 7; i++) {
+    const d = document.createElement('div');
+    d.className = 'day-pill' + (i === currentDay ? ' active' : '');
+    const prog = getDayProgress(i);
+    if (prog.done > 0) d.classList.add('has-progress');
+    d.innerHTML = SHORT[i] + '<div class="day-dot"></div>';
+    d.onclick = () => { currentDay = i; renderAll(); };
+    nav.appendChild(d);
+  }
+}
+
+function renderTasks() {
+  const tasks = getDayTasks(currentDay);
+  const container = document.getElementById('tasks-container');
+  container.innerHTML = '';
+
+  if (!tasks.length) {
+    container.innerHTML = '<div style="color:var(--muted);font-size:14px;padding:1rem 0;">No tasks scheduled.</div>';
+    return;
+  }
+
+  // Group by section? Just render flat with section label
+  const label = document.createElement('div');
+  label.className = 'section-label';
+  label.textContent = "Today's tasks";
+  container.appendChild(label);
+
+  const list = document.createElement('div');
+  list.className = 'task-list';
+
+  tasks.forEach((task, i) => {
+    const done = isTaskDone(currentDay, i);
+    const cat = CATEGORIES[task.cat] || CATEGORIES.hygiene;
+
+    const el = document.createElement('div');
+    el.className = 'task' + (done ? ' done' : '');
+    el.style.setProperty('--task-color', cat.color);
+
+    el.innerHTML = `
+      <div class="task-check">
+        <svg width="12" height="10" viewBox="0 0 12 10" fill="none">
+          <path d="M1 5L4.5 8.5L11 1.5" stroke="#0a0a0f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="task-body">
+        <div class="task-time">${task.time}</div>
+        <div class="task-title">${task.title}</div>
+        ${task.sub ? `<div class="task-sub">${task.sub}</div>` : ''}
+      </div>
+      <div class="task-xp">+${task.xp}</div>
+    `;
+
+    el.onclick = () => toggleTask(currentDay, i, task.xp, el);
+    list.appendChild(el);
+  });
+
+  container.appendChild(list);
+}
+
+function renderProgress() {
+  const prog = getDayProgress(currentDay);
+  const pct = prog.total ? Math.round((prog.done / prog.total) * 100) : 0;
+  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('done-count').textContent = prog.done + ' done';
+  document.getElementById('total-count').textContent = prog.total + ' tasks';
+  document.getElementById('today-day-name').textContent = DAYS[currentDay];
+
+  const allDone = document.getElementById('all-done');
+  if (prog.done === prog.total && prog.total > 0) {
+    allDone.classList.add('show');
+    document.getElementById('all-done-sub').textContent =
+      `You crushed ${prog.total} tasks today. Streak: ${state.streak} days.`;
+  } else {
+    allDone.classList.remove('show');
+  }
+}
+
+function renderAll() {
+  renderHeader();
+  renderQuote();
+  renderDayNav();
+  renderTasks();
+  renderProgress();
+}
+
+function showXpPopup(xp, el) {
+  const rect = el.getBoundingClientRect();
+  const popup = document.createElement('div');
+  popup.className = 'xp-popup';
+  popup.textContent = '+' + xp + ' XP';
+  popup.style.left = (rect.left + rect.width / 2 - 20) + 'px';
+  popup.style.top = (rect.top + window.scrollY) + 'px';
+  document.body.appendChild(popup);
+  setTimeout(() => popup.remove(), 1000);
+}
+
+function toggleTask(dayIdx, taskIdx, xp, el) {
+  const wasDone = isTaskDone(dayIdx, taskIdx);
+  setTaskDone(dayIdx, taskIdx, !wasDone);
+
+  if (!wasDone) {
+    state.xp += xp;
+    el.classList.add('just-done');
+    setTimeout(() => el.classList.remove('just-done'), 300);
+    showXpPopup(xp, el);
+
+    // Check if all done for today
+    const prog = getDayProgress(dayIdx);
+    if (prog.done === prog.total) {
+      state.xp += XP_BONUS_ALL;
+      const today = getTodayKey();
+      if (state.lastDay !== today) {
+        state.streak++;
+        state.lastDay = today;
+      }
+      setTimeout(() => showXpPopup(XP_BONUS_ALL, document.getElementById('today-day-name')), 600);
+    }
+  } else {
+    state.xp = Math.max(0, state.xp - xp);
+  }
+
+  saveState(state);
+  renderAll();
+}
+
+function confirmReset() {
+  document.getElementById('reset-overlay').classList.add('show');
+}
+function closeReset() {
+  document.getElementById('reset-overlay').classList.remove('show');
+}
+function doReset() {
+  state = { xp: 0, streak: 0, lastDay: null, done: {} };
+  saveState(state);
+  closeReset();
+  renderAll();
+}
+
+renderAll();
+</script>
+</body>
+</html>
