@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Daily Grind">
 <meta name="theme-color" content="#0a0a0f">
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Pangolin&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg: #0a0a0f;
@@ -26,7 +26,7 @@
   --done: #3cf08a;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--bg); color: var(--text); font-family: 'Comic Sans MS', 'Comic Sans', cursive; min-height: 100vh; overflow-x: hidden; }
+body { background: var(--bg); color: var(--text); font-family: 'Pangolin', cursive; min-height: 100vh; overflow-x: hidden; }
 
 header {
   position: sticky; top: 0; z-index: 100;
@@ -35,10 +35,10 @@ header {
   padding: 0.75rem 1.25rem;
   display: flex; align-items: center; justify-content: space-between;
 }
-.logo { font-family: 'Space Mono', monospace; font-size: 13px; color: var(--accent); letter-spacing: 0.05em; }
+.logo { font-family: 'Pangolin', cursive; font-size: 13px; color: var(--accent); letter-spacing: 0.05em; }
 .header-right { display: flex; align-items: center; gap: 8px; }
-.xp-badge { background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 4px 10px; font-size: 12px; font-weight: 700; color: var(--gold); font-family: Arial, sans-serif; }
-.streak-badge { background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 4px 10px; font-size: 12px; font-weight: 700; color: var(--accent3); font-family: Arial, sans-serif; }
+.xp-badge { background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 4px 10px; font-size: 12px; font-weight: 700; color: var(--gold); font-family: 'Pangolin', cursive; }
+.streak-badge { background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 4px 10px; font-size: 12px; font-weight: 700; color: var(--accent3); font-family: 'Pangolin', cursive; }
 .icon-btn { background: none; border: 1px solid var(--border); color: var(--muted); font-size: 14px; padding: 4px 8px; border-radius: 6px; cursor: pointer; transition: all 0.15s; }
 .icon-btn:hover { border-color: var(--accent); color: var(--accent); }
 
@@ -47,36 +47,36 @@ main { position: relative; z-index: 1; padding: 1rem 1.25rem; max-width: 480px; 
 .level-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 12px; }
 .level-icon { width: 40px; height: 40px; border-radius: 10px; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
 .level-info { flex: 1; }
-.level-name { font-size: 14px; font-weight: 700; font-family: Arial, sans-serif; }
-.level-sub { font-size: 11px; color: var(--muted); font-family: 'Comic Sans MS', 'Comic Sans', cursive; }
+.level-name { font-size: 14px; font-weight: 700; font-family: 'Pangolin', cursive; }
+.level-sub { font-size: 11px; color: var(--muted); font-family: 'Pangolin', cursive; }
 .level-xp-wrap { background: var(--surface2); border-radius: 4px; height: 4px; margin-top: 5px; overflow: hidden; }
 .level-xp-bar { height: 100%; background: var(--accent2); border-radius: 4px; transition: width 0.4s; }
 
 #quote-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 0.85rem 1rem; margin-bottom: 1rem; border-left: 3px solid var(--accent2); }
-#quote-label { font-size: 10px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; font-family: 'Space Mono', monospace; margin-bottom: 5px; }
-#quote-text { font-size: 12px; color: var(--text); font-style: italic; line-height: 1.5; font-family: 'Calibri', 'Candara', sans-serif; }
-#quote-author { font-size: 11px; color: var(--accent); font-family: 'Calibri', 'Candara', sans-serif; margin-top: 4px; }
+#quote-label { font-size: 10px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; font-family: 'Pangolin', cursive; margin-bottom: 5px; }
+#quote-text { font-size: 12px; color: var(--text); font-style: italic; line-height: 1.5; font-family: 'Pangolin', cursive; }
+#quote-author { font-size: 11px; color: var(--accent); font-family: 'Pangolin', cursive; margin-top: 4px; }
 
 .day-nav { display: flex; gap: 6px; margin-bottom: 1rem; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
 .day-nav::-webkit-scrollbar { display: none; }
-.day-pill { flex-shrink: 0; padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface); color: var(--muted); font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; position: relative; font-family: Arial, sans-serif; }
+.day-pill { flex-shrink: 0; padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface); color: var(--muted); font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; position: relative; font-family: 'Pangolin', cursive; }
 .day-pill.active { background: var(--accent); color: #000; border-color: var(--accent); }
 .day-pill .day-dot { position: absolute; top: 4px; right: 4px; width: 6px; height: 6px; border-radius: 50%; background: var(--done); display: none; }
 .day-pill.has-progress .day-dot { display: block; }
 
 .today-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; margin-bottom: 1rem; }
 .today-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px; }
-.today-label { font-size: 10px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; font-family: 'Space Mono', monospace; margin-bottom: 3px; }
-.today-day { font-size: 24px; font-weight: 800; line-height: 1; font-family: Arial, sans-serif; }
-.add-task-btn { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--accent); font-size: 11px; font-family: 'Space Mono', monospace; padding: 5px 10px; cursor: pointer; transition: all 0.15s; white-space: nowrap; margin-top: 2px; }
+.today-label { font-size: 10px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; font-family: 'Pangolin', cursive; margin-bottom: 3px; }
+.today-day { font-size: 24px; font-weight: 800; line-height: 1; font-family: 'Pangolin', cursive; }
+.add-task-btn { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--accent); font-size: 11px; font-family: 'Pangolin', cursive; padding: 5px 10px; cursor: pointer; transition: all 0.15s; white-space: nowrap; margin-top: 2px; }
 .add-task-btn:hover { border-color: var(--accent); background: rgba(200,240,60,0.08); }
 .delete-btn { background: none; border: none; color: var(--muted); font-size: 14px; cursor: pointer; padding: 2px 4px; border-radius: 4px; transition: color 0.15s; line-height: 1; }
 .delete-btn:hover { color: var(--accent3); }
 .progress-wrap { background: var(--surface2); border-radius: 4px; height: 6px; overflow: hidden; margin-bottom: 5px; }
 .progress-bar { height: 100%; background: var(--accent); border-radius: 4px; transition: width 0.4s ease; }
-.progress-label { font-size: 11px; color: var(--muted); font-family: Arial, sans-serif; display: flex; justify-content: space-between; }
+.progress-label { font-size: 11px; color: var(--muted); font-family: 'Pangolin', cursive; display: flex; justify-content: space-between; }
 
-.section-label { font-size: 10px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; font-family: Arial, sans-serif; margin: 1rem 0 0.5rem; }
+.section-label { font-size: 10px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; font-family: 'Pangolin', cursive; margin: 1rem 0 0.5rem; }
 .task-list { display: flex; flex-direction: column; gap: 6px; }
 
 .task-wrap { position: relative; }
@@ -98,20 +98,20 @@ main { position: relative; z-index: 1; padding: 1rem 1.25rem; max-width: 480px; 
 .task.done .task-check svg { display: block; }
 
 .task-body { flex: 1; min-width: 0; cursor: pointer; }
-.task-time { font-size: 11px; color: var(--accent); font-family: Arial, sans-serif; margin-bottom: 2px; }
-.task-title { font-size: 14px; font-weight: 400; line-height: 1.3; font-family: 'Calibri', 'Candara', sans-serif; }
-.task-sub { font-size: 12px; color: var(--muted); margin-top: 2px; font-family: 'Comic Sans MS', 'Comic Sans', cursive; }
+.task-time { font-size: 11px; color: var(--accent); font-family: 'Pangolin', cursive; margin-bottom: 2px; }
+.task-title { font-size: 14px; font-weight: 400; line-height: 1.3; font-family: 'Pangolin', cursive; }
+.task-sub { font-size: 12px; color: var(--muted); margin-top: 2px; font-family: 'Pangolin', cursive; }
 
 .task-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
-.task-xp { font-size: 10px; font-family: Arial, sans-serif; color: var(--gold); font-weight: 700; padding: 2px 6px; background: rgba(255,215,0,0.08); border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); }
+.task-xp { font-size: 10px; font-family: 'Pangolin', cursive; color: var(--gold); font-weight: 700; padding: 2px 6px; background: rgba(255,215,0,0.08); border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); }
 .edit-btn { background: none; border: none; color: var(--muted); font-size: 13px; cursor: pointer; padding: 2px 4px; border-radius: 4px; transition: color 0.15s; line-height: 1; }
 .edit-btn:hover { color: var(--accent); }
 
 /* NOTES PANEL */
 .notes-panel { display: none; background: var(--surface2); border: 1px solid var(--border); border-top: none; border-radius: 0 0 12px 12px; padding: 0.75rem 1rem; margin-top: -6px; padding-top: 0.9rem; }
 .notes-panel.open { display: block; }
-.notes-label { font-size: 10px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; font-family: 'Space Mono', monospace; margin-bottom: 6px; }
-.notes-input { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: 'Comic Sans MS', 'Comic Sans', cursive; font-size: 13px; padding: 0.6rem 0.75rem; resize: none; min-height: 80px; outline: none; transition: border-color 0.2s; line-height: 1.5; }
+.notes-label { font-size: 10px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; font-family: 'Pangolin', cursive; margin-bottom: 6px; }
+.notes-input { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: 'Pangolin', cursive; font-size: 13px; padding: 0.6rem 0.75rem; resize: none; min-height: 80px; outline: none; transition: border-color 0.2s; line-height: 1.5; }
 .notes-input:focus { border-color: var(--accent2); }
 .notes-input::placeholder { color: var(--muted); }
 
@@ -128,27 +128,27 @@ main { position: relative; z-index: 1; padding: 1rem 1.25rem; max-width: 480px; 
   80% { opacity: 1; transform: translateY(-30px) scale(1); }
   100% { opacity: 0; transform: translateY(-50px) scale(0.9); }
 }
-.xp-popup { position: fixed; pointer-events: none; font-family: Arial, sans-serif; font-size: 13px; font-weight: 700; color: var(--gold); z-index: 9999; animation: xpPop 1s ease forwards; }
+.xp-popup { position: fixed; pointer-events: none; font-family: 'Pangolin', cursive; font-size: 13px; font-weight: 700; color: var(--gold); z-index: 9999; animation: xpPop 1s ease forwards; }
 
 /* MODALS */
 .overlay { display: none; position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.75); align-items: center; justify-content: center; padding: 1rem; }
 .overlay.show { display: flex; }
 .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; width: 100%; max-width: 360px; }
-.modal-title { font-size: 16px; font-weight: 700; margin-bottom: 1rem; font-family: Arial, sans-serif; }
+.modal-title { font-size: 16px; font-weight: 700; margin-bottom: 1rem; font-family: 'Pangolin', cursive; }
 .modal-field { margin-bottom: 0.85rem; }
-.modal-field label { font-size: 11px; color: var(--muted); font-family: 'Space Mono', monospace; letter-spacing: 0.05em; text-transform: uppercase; display: block; margin-bottom: 5px; }
+.modal-field label { font-size: 11px; color: var(--muted); font-family: 'Pangolin', cursive; letter-spacing: 0.05em; text-transform: uppercase; display: block; margin-bottom: 5px; }
 .modal-field input, .modal-field select, .modal-field textarea {
   width: 100%; background: var(--surface2); border: 1px solid var(--border);
-  border-radius: 8px; color: var(--text); font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+  border-radius: 8px; color: var(--text); font-family: 'Pangolin', cursive;
   font-size: 13px; padding: 8px 10px; outline: none; transition: border-color 0.2s;
 }
 .modal-field input:focus, .modal-field select:focus, .modal-field textarea:focus { border-color: var(--accent2); }
 .modal-field select option { background: var(--surface2); }
 .modal-field textarea { resize: none; min-height: 60px; line-height: 1.4; }
 .modal-btns { display: flex; gap: 8px; margin-top: 1.25rem; }
-.btn-primary { flex: 1; padding: 10px; border-radius: 8px; border: none; background: var(--accent); color: #000; font-family: 'Comic Sans MS', 'Comic Sans', cursive; font-size: 14px; font-weight: 700; cursor: pointer; }
-.btn-secondary { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface2); color: var(--text); font-family: 'Comic Sans MS', 'Comic Sans', cursive; font-size: 14px; cursor: pointer; }
-.btn-danger { flex: 1; padding: 10px; border-radius: 8px; border: none; background: var(--accent3); color: #fff; font-family: 'Comic Sans MS', 'Comic Sans', cursive; font-size: 14px; font-weight: 700; cursor: pointer; }
+.btn-primary { flex: 1; padding: 10px; border-radius: 8px; border: none; background: var(--accent); color: #000; font-family: 'Pangolin', cursive; font-size: 14px; font-weight: 700; cursor: pointer; }
+.btn-secondary { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface2); color: var(--text); font-family: 'Pangolin', cursive; font-size: 14px; cursor: pointer; }
+.btn-danger { flex: 1; padding: 10px; border-radius: 8px; border: none; background: var(--accent3); color: #fff; font-family: 'Pangolin', cursive; font-size: 14px; font-weight: 700; cursor: pointer; }
 
 @keyframes checkBounce { 0% { transform: scale(1); } 40% { transform: scale(1.15); } 100% { transform: scale(1); } }
 .task.just-done .task-check { animation: checkBounce 0.3s ease; }
