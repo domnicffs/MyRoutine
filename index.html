@@ -702,6 +702,19 @@ function closeEdit() {
   editTarget = null;
 }
 
+function parseTime(t) {
+  // Extract first time from strings like "10:00 – 10:30" or "10:40" or "~14:00"
+  const m = t.replace('~','').match(/(\d{1,2}):(\d{2})/);
+  if (!m) return 9999;
+  return parseInt(m[1]) * 60 + parseInt(m[2]);
+}
+
+function sortTasks(dayIdx) {
+  if (SCHEDULE[dayIdx]) {
+    SCHEDULE[dayIdx].sort((a, b) => parseTime(a.time) - parseTime(b.time));
+  }
+}
+
 function saveEdit() {
   if (!editTarget) return;
   const { dayIdx, taskIdx, isNew } = editTarget;
@@ -719,6 +732,7 @@ function saveEdit() {
   } else {
     SCHEDULE[dayIdx][taskIdx] = task;
   }
+  sortTasks(dayIdx);
   saveSchedule();
   closeEdit();
   renderAll();
