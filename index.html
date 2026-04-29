@@ -80,11 +80,29 @@ main { position: relative; z-index: 1; padding: 1rem 1.25rem; max-width: 480px; 
 .task-list { display: flex; flex-direction: column; gap: 6px; }
 
 .task-wrap { position: relative; }
+.task::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--task-color, var(--accent2)); border-radius: 3px 0 0 3px; }
+.task:active { transform: scale(0.99); }
+.task.done { background: rgba(60,240,138,0.04); border-color: rgba(60,240,138,0.2); }
+.task.done .task-title { text-decoration: line-through; color: var(--muted); }
+.task.done .task-time { color: var(--muted); }
+
+.task-check { width: 24px; height: 24px; border-radius: 6px; border: 1.5px solid var(--border); background: var(--surface2); flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.2s; cursor: pointer; }
+.task.done .task-check { background: var(--done); border-color: var(--done); }
+.task-check svg { display: none; }
+.task.done .task-check svg { display: block; }
+
+/* New task layout — grid based */
 .task {
   background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
-  padding: 0.85rem 0.85rem 0.85rem 1rem;
-  display: flex; align-items: flex-start; gap: 10px;
-  position: relative; overflow: hidden; transition: border-color 0.2s;
+  padding: 0.75rem 0.85rem;
+  display: grid;
+  grid-template-areas:
+    "check body edit"
+    "check body edit"
+    "notes-btn . delete";
+  grid-template-columns: 32px 1fr 44px;
+  grid-template-rows: auto auto 36px;
+  position: relative; overflow: hidden; transition: border-color 0.2s; cursor: pointer;
 }
 .task::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--task-color, var(--accent2)); border-radius: 3px 0 0 3px; }
 .task:active { transform: scale(0.99); }
@@ -92,20 +110,42 @@ main { position: relative; z-index: 1; padding: 1rem 1.25rem; max-width: 480px; 
 .task.done .task-title { text-decoration: line-through; color: var(--muted); }
 .task.done .task-time { color: var(--muted); }
 
-.task-check { width: 20px; height: 20px; border-radius: 5px; border: 1.5px solid var(--border); background: var(--surface2); flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.2s; margin-top: 1px; cursor: pointer; }
-.task.done .task-check { background: var(--done); border-color: var(--done); }
-.task-check svg { display: none; }
-.task.done .task-check svg { display: block; }
+/* New task layout — grid based */
+.task {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+  padding: 0.75rem 0.85rem;
+  display: grid;
+  grid-template-areas:
+    "check body edit"
+    "notes body delete";
+  grid-template-columns: 32px 1fr 36px;
+  grid-template-rows: 1fr 1fr;
+  position: relative; overflow: hidden; transition: border-color 0.2s; cursor: pointer;
+  min-height: 72px;
+}
+.task::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--task-color, var(--accent2)); border-radius: 3px 0 0 3px; }
+.task:active { transform: scale(0.99); }
+.task.done { background: rgba(60,240,138,0.04); border-color: rgba(60,240,138,0.2); }
+.task.done .task-title { text-decoration: line-through; color: var(--muted); }
+.task.done .task-time { color: var(--muted); }
 
-.task-body { flex: 1; min-width: 0; cursor: pointer; }
+.task-check { grid-area: check; align-self: center; justify-self: center; }
+.task-body { grid-area: body; min-width: 0; padding: 0 8px; align-self: center; }
 .task-time { font-size: 11px; color: var(--accent); font-family: 'Pangolin', cursive; margin-bottom: 2px; }
 .task-title { font-size: 14px; font-weight: 400; line-height: 1.3; font-family: 'Pangolin', cursive; }
 .task-sub { font-size: 12px; color: var(--muted); margin-top: 2px; font-family: 'Pangolin', cursive; }
 
-.task-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
-.task-xp { font-size: 10px; font-family: 'Pangolin', cursive; color: var(--gold); font-weight: 700; padding: 2px 6px; background: rgba(255,215,0,0.08); border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); }
-.edit-btn { background: none; border: none; color: var(--muted); font-size: 13px; cursor: pointer; padding: 2px 4px; border-radius: 4px; transition: color 0.15s; line-height: 1; }
+.task-edit-wrap { grid-area: edit; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+.task-xp { font-size: 10px; font-family: 'Pangolin', cursive; color: var(--gold); font-weight: 700; padding: 2px 5px; background: rgba(255,215,0,0.08); border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); white-space: nowrap; }
+.edit-btn { background: none; border: none; color: var(--muted); font-size: 18px; cursor: pointer; padding: 2px; transition: color 0.15s; line-height: 1; display: flex; align-items: center; justify-content: center; }
 .edit-btn:hover { color: var(--accent); }
+
+.notes-btn { grid-area: notes; align-self: center; justify-self: center; background: none; border: none; color: var(--muted); font-size: 17px; cursor: pointer; padding: 2px; transition: color 0.15s; line-height: 1; display: flex; align-items: center; justify-content: center; }
+.notes-btn:hover { color: var(--accent2); }
+.notes-btn.has-note { color: var(--accent2); }
+
+.delete-btn { grid-area: delete; align-self: center; justify-self: center; background: none; border: none; color: var(--muted); font-size: 17px; cursor: pointer; padding: 2px; transition: color 0.15s; line-height: 1; display: flex; align-items: center; justify-content: center; }
+.delete-btn:hover { color: var(--accent3); }
 
 /* NOTES PANEL */
 .notes-panel { display: none; background: var(--surface2); border: 1px solid var(--border); border-top: none; border-radius: 0 0 12px 12px; padding: 0.75rem 1rem; margin-top: -6px; padding-top: 0.9rem; }
@@ -584,17 +624,17 @@ function renderTasks() {
           <path d="M1 5L4.5 8.5L11 1.5" stroke="#0a0a0f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
-      <div class="task-body" onclick="toggleNotes(${i})">
+      <div class="task-body" onclick="handleCheck(event,${currentDay},${i},${task.xp},this.previousElementSibling)">
         <div class="task-time">${task.time}</div>
         <div class="task-title">${task.title}</div>
         ${task.sub ? `<div class="task-sub">${task.sub}</div>` : ''}
-        ${note ? `<div style="font-size:11px;color:var(--accent2);margin-top:4px;font-style:italic;">📝 Has notes</div>` : ''}
       </div>
-      <div class="task-actions">
+      <div class="task-edit-wrap">
         <div class="task-xp">+${task.xp}</div>
-        <button class="edit-btn" onclick="openEdit(event,${currentDay},${i})" title="Edit task">✎</button>
-        <button class="delete-btn" onclick="confirmDeleteTask(event,${currentDay},${i})" title="Delete task">✕</button>
+        <button class="edit-btn" onclick="openEdit(event,${currentDay},${i})" title="Edit">✎</button>
       </div>
+      <button class="notes-btn ${note ? 'has-note' : ''}" onclick="openNotePanel(event,${i})" title="Notes">≡</button>
+      <button class="delete-btn" onclick="confirmDeleteTask(event,${currentDay},${i})" title="Delete">✕</button>
     `;
 
     const notesPanel = document.createElement('div');
@@ -640,6 +680,7 @@ function renderAll() {
 function handleCheck(e, dayIdx, taskIdx, xp, checkEl) {
   e.stopPropagation();
   const wasDone = isTaskDone(dayIdx, taskIdx);
+  const wasAllDone = getDayProgress(dayIdx).done === getDayProgress(dayIdx).total && getDayProgress(dayIdx).total > 0;
   setTaskDone(dayIdx, taskIdx, !wasDone);
   if (!wasDone) {
     state.xp += xp;
@@ -656,12 +697,25 @@ function handleCheck(e, dayIdx, taskIdx, xp, checkEl) {
     }
   } else {
     state.xp = Math.max(0, state.xp - xp);
+    // If day was fully complete before this untick, reverse the streak and bonus
+    if (wasAllDone) {
+      state.xp = Math.max(0, state.xp - XP_BONUS_ALL);
+      const today = getTodayKey();
+      if (state.lastDay === today) { state.streak = Math.max(0, state.streak - 1); state.lastDay = null; }
+    }
   }
   saveState(state);
   renderAll();
 }
 
 // NOTES
+function openNotePanel(e, taskIdx) {
+  e.stopPropagation();
+  openNotes[taskIdx] = !openNotes[taskIdx];
+  renderTasks();
+  renderProgress();
+}
+
 function toggleNotes(taskIdx) {
   openNotes[taskIdx] = !openNotes[taskIdx];
   renderTasks();
