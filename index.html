@@ -142,7 +142,7 @@ main { position: relative; z-index: 1; padding: 1rem 1.25rem; max-width: 480px; 
 
 .notes-btn { grid-area: notes; align-self: center; justify-self: center; background: none; border: none; color: var(--muted); font-size: 17px; cursor: pointer; padding: 2px; transition: color 0.15s; line-height: 1; display: flex; align-items: center; justify-content: center; }
 .notes-btn:hover { color: var(--accent2); }
-.notes-btn.has-note { color: var(--accent2); }
+.notes-btn.has-note { color: #ff6b35; text-shadow: 0 0 8px rgba(255,107,53,0.8), 0 0 16px rgba(255,107,53,0.4); }
 
 .delete-btn { grid-area: delete; align-self: center; justify-self: center; background: none; border: none; color: var(--muted); font-size: 17px; cursor: pointer; padding: 2px; transition: color 0.15s; line-height: 1; display: flex; align-items: center; justify-content: center; }
 .delete-btn:hover { color: var(--accent3); }
@@ -380,7 +380,7 @@ const QUOTES = [
 const DEFAULT_SCHEDULE = {
   1: [
     { time:'10:00 – 10:10', title:'Wake up & relax', sub:'Lay still for 5 mins, then open curtains and sit for 5 mins', cat:'hygiene', xp:10 },
-    { time:'10:10 – 10:40', title:'Hygiene', sub:'Brush, floss, face wash', cat:'hygiene', xp:15 },
+    { time:'10:10 – 10:40', title:'Morning hygiene', sub:'Brush, floss, face wash', cat:'hygiene', xp:15 },
     { time:'10:40', title:'Market review', sub:'Wait for the right confluences before entry — follow the plan', cat:'trading', xp:15 },
     { time:'11:30', title:'Make food & eat', sub:'Eat and relax', cat:'food', xp:10 },
     { time:'12:15', title:'Iron clothes & get ready', sub:'Check traffic before leaving', cat:'prep', xp:10 },
@@ -393,7 +393,7 @@ const DEFAULT_SCHEDULE = {
   ],
   2: [
     { time:'10:00 – 10:10', title:'Wake up & relax', sub:'Lay still for 5 mins, then open curtains and sit for 5 mins', cat:'hygiene', xp:10 },
-    { time:'10:10 – 10:40', title:'Hygiene', sub:'Brush, floss, face wash', cat:'hygiene', xp:15 },
+    { time:'10:10 – 10:40', title:'Morning hygiene', sub:'Brush, floss, face wash', cat:'hygiene', xp:15 },
     { time:'10:40', title:'Market review', sub:'Wait for the right confluences before entry — follow the plan', cat:'trading', xp:15 },
     { time:'11:30', title:'Make food & eat', sub:'Eat and relax', cat:'food', xp:10 },
     { time:'12:15', title:'Iron clothes & get ready', sub:'Check traffic before leaving', cat:'prep', xp:10 },
@@ -406,7 +406,7 @@ const DEFAULT_SCHEDULE = {
   3: [
     { time:'10:00 – 10:10', title:'Wake up & relax', sub:'Lay still for 5 mins, then open curtains and sit for 5 mins', cat:'hygiene', xp:10 },
     { time:'10:10', title:'Hair oil', sub:'Massage oil into hair — let it marinate', cat:'haircare', xp:10 },
-    { time:'10:10 – 10:40', title:'Hygiene', sub:'Brush, floss, face wash', cat:'hygiene', xp:10 },
+    { time:'10:10 – 10:40', title:'Morning hygiene', sub:'Brush, floss, face wash', cat:'hygiene', xp:10 },
     { time:'10:40', title:'Market review', sub:'Wait for the right confluences before entry — follow the plan', cat:'trading', xp:15 },
     { time:'11:15', title:'Shower', sub:'Wash the oil out', cat:'hygiene', xp:10 },
     { time:'11:45', title:'Make food & eat', sub:'Eat and relax', cat:'food', xp:10 },
@@ -420,7 +420,7 @@ const DEFAULT_SCHEDULE = {
   ],
   4: [
     { time:'10:00 – 10:10', title:'Wake up & relax', sub:'Lay still for 5 mins, then open curtains and sit for 5 mins', cat:'hygiene', xp:10 },
-    { time:'10:10 – 10:40', title:'Hygiene', sub:'Brush, floss, face wash', cat:'hygiene', xp:15 },
+    { time:'10:10 – 10:40', title:'Morning hygiene', sub:'Brush, floss, face wash', cat:'hygiene', xp:15 },
     { time:'10:40', title:'Market review', sub:'Wait for the right confluences before entry — follow the plan', cat:'trading', xp:15 },
     { time:'11:30', title:'Make food & eat', sub:'Eat and relax', cat:'food', xp:10 },
     { time:'12:15', title:'Iron clothes & get ready', sub:'Check traffic before leaving', cat:'prep', xp:10 },
@@ -432,7 +432,7 @@ const DEFAULT_SCHEDULE = {
   ],
   5: [
     { time:'10:00 – 10:10', title:'Wake up & relax', sub:'Lay still for 5 mins, then open curtains and sit for 5 mins', cat:'hygiene', xp:10 },
-    { time:'10:10 – 10:40', title:'Hygiene', sub:'Brush, floss, face wash', cat:'hygiene', xp:15 },
+    { time:'10:10 – 10:40', title:'Morning hygiene', sub:'Brush, floss, face wash', cat:'hygiene', xp:15 },
     { time:'10:40', title:'Market review', sub:'Wait for the right confluences before entry — follow the plan', cat:'trading', xp:15 },
     { time:'11:30', title:'Make food & eat', sub:'Eat and relax', cat:'food', xp:10 },
     { time:'12:15', title:'Iron clothes & get ready', sub:'Check traffic before leaving', cat:'prep', xp:10 },
@@ -446,7 +446,7 @@ const DEFAULT_SCHEDULE = {
   6: [
     { time:'10:00 – 10:10', title:'Wake up & relax', sub:'Lay still for 5 mins, then open curtains and sit for 5 mins', cat:'hygiene', xp:10 },
     { time:'10:10', title:'Laundry', sub:'Throw clothes in the washing machine', cat:'chores', xp:10 },
-    { time:'10:20 – 10:50', title:'Hygiene', sub:'Brush, floss, face wash', cat:'hygiene', xp:10 },
+    { time:'10:20 – 10:50', title:'Morning hygiene', sub:'Brush, floss, face wash', cat:'hygiene', xp:10 },
     { time:'10:50', title:'Clean room', sub:'Tidy up properly', cat:'chores', xp:15 },
     { time:'11:45', title:'Make food & eat', sub:'Eat and relax', cat:'food', xp:10 },
     { time:'12:30', title:'Go grocery shopping', sub:'Get the week sorted', cat:'shopping', xp:15 },
@@ -460,7 +460,7 @@ const DEFAULT_SCHEDULE = {
   0: [
     { time:'10:00 – 10:10', title:'Wake up & relax', sub:'Lay still for 5 mins, then open curtains and sit for 5 mins', cat:'hygiene', xp:10 },
     { time:'10:10', title:'Hair oil', sub:'Apply and massage in — marinates all day until evening', cat:'haircare', xp:10 },
-    { time:'10:10 – 10:40', title:'Hygiene', sub:'Brush, floss, face wash', cat:'hygiene', xp:10 },
+    { time:'10:10 – 10:40', title:'Morning hygiene', sub:'Brush, floss, face wash', cat:'hygiene', xp:10 },
     { time:'10:40', title:'Market review', sub:'Wait for the right confluences before entry — follow the plan', cat:'trading', xp:20 },
     { time:'12:00', title:'Make food & eat', sub:'Eat and relax', cat:'food', xp:10 },
     { time:'13:00', title:'Read', sub:'Afternoon reading session', cat:'reading', xp:15 },
@@ -575,7 +575,9 @@ function renderHeader() {
 function renderDayNav() {
   const nav = document.getElementById('day-nav');
   nav.innerHTML = '';
-  for (let i = 0; i < 7; i++) {
+  // Start from Monday (1) to Sunday (0)
+  const order = [1,2,3,4,5,6,0];
+  order.forEach(i => {
     const d = document.createElement('div');
     d.className = 'day-pill' + (i === currentDay ? ' active' : '');
     const prog = getDayProgress(i);
@@ -583,7 +585,7 @@ function renderDayNav() {
     d.innerHTML = SHORT[i] + '<div class="day-dot"></div>';
     d.onclick = () => { currentDay = i; openNotes = {}; renderAll(); };
     nav.appendChild(d);
-  }
+  });
 }
 
 function renderTasks() {
@@ -626,7 +628,7 @@ function renderTasks() {
       </div>
       <div class="task-body" onclick="handleCheck(event,${currentDay},${i},${task.xp},this.previousElementSibling)">
         <div class="task-time">${task.time}</div>
-        <div class="task-title">${task.title}</div>
+        <div class="task-title">${toTitleCase(task.title)}</div>
         ${task.sub ? `<div class="task-sub">${task.sub}</div>` : ''}
       </div>
       <div class="task-edit-wrap">
@@ -754,6 +756,10 @@ function openAddTask() {
 function closeEdit() {
   document.getElementById('edit-overlay').classList.remove('show');
   editTarget = null;
+}
+
+function toTitleCase(str) {
+  return str.replace(/\b\w/g, c => c.toUpperCase());
 }
 
 function parseTime(t) {
