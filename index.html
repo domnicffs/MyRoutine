@@ -129,22 +129,51 @@ main { position: relative; z-index: 1; padding: 1rem 1.25rem; max-width: 480px; 
 .task.done .task-title { text-decoration: line-through; color: var(--muted); }
 .task.done .task-time { color: var(--muted); }
 
-.task-check { grid-area: check; align-self: center; justify-self: center; }
-.task-body { grid-area: body; min-width: 0; padding: 0 8px; align-self: center; }
-.task-time { font-size: 11px; color: var(--accent); font-family: 'Pangolin', cursive; margin-bottom: 2px; }
-.task-title { font-size: 14px; font-weight: 400; line-height: 1.3; font-family: 'Pangolin', cursive; }
-.task-sub { font-size: 12px; color: var(--muted); margin-top: 2px; font-family: 'Pangolin', cursive; }
+/* Task grid — 3 rows, left col / middle / right col */
+.task {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+  padding: 0.75rem 0.85rem;
+  display: grid;
+  grid-template-areas:
+    "check  time   xp"
+    "notes  title  edit"
+    "swap   desc   del";
+  grid-template-columns: 36px 1fr 36px;
+  grid-template-rows: auto auto auto;
+  gap: 5px 0;
+  position: relative; overflow: hidden; transition: border-color 0.2s;
+}
+.task::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--task-color, var(--accent2)); border-radius: 3px 0 0 3px; }
+.task:active { transform: scale(0.99); }
+.task.done { background: rgba(60,240,138,0.04); border-color: rgba(60,240,138,0.2); }
+.task.done .task-title { text-decoration: line-through; color: var(--muted); }
+.task.done .task-time { color: var(--muted); }
 
-.task-edit-wrap { grid-area: edit; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
-.task-xp { font-size: 10px; font-family: 'Pangolin', cursive; color: var(--gold); font-weight: 700; padding: 2px 5px; background: rgba(255,215,0,0.08); border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); white-space: nowrap; }
-.edit-btn { background: none; border: none; color: var(--muted); font-size: 18px; cursor: pointer; padding: 2px; transition: color 0.15s; line-height: 1; display: flex; align-items: center; justify-content: center; }
-.edit-btn:hover { color: var(--accent); }
+/* Left column */
+.task-check { grid-area: check; align-self: center; justify-self: center; width: 24px; height: 24px; border-radius: 6px; border: 1.5px solid var(--border); background: var(--surface2); display: flex; align-items: center; justify-content: center; transition: all 0.2s; cursor: pointer; }
+.task.done .task-check { background: var(--done); border-color: var(--done); }
+.task-check svg { display: none; }
+.task.done .task-check svg { display: block; }
 
-.notes-btn { grid-area: notes; align-self: center; justify-self: center; background: none; border: none; color: var(--muted); font-size: 17px; cursor: pointer; padding: 2px; transition: color 0.15s; line-height: 1; display: flex; align-items: center; justify-content: center; }
+.notes-btn { grid-area: notes; align-self: center; justify-self: center; background: none; border: none; font-size: 17px; cursor: pointer; padding: 4px; transition: color 0.15s; line-height: 1; color: var(--muted); }
 .notes-btn:hover { color: var(--accent2); }
 .notes-btn.has-note { color: #ff6b35; text-shadow: 0 0 8px rgba(255,107,53,0.8), 0 0 16px rgba(255,107,53,0.4); }
 
-.delete-btn { grid-area: delete; align-self: center; justify-self: center; background: none; border: none; color: var(--muted); font-size: 17px; cursor: pointer; padding: 2px; transition: color 0.15s; line-height: 1; display: flex; align-items: center; justify-content: center; }
+.swap-btn { grid-area: swap; align-self: center; justify-self: center; background: none; border: none; font-size: 15px; cursor: pointer; padding: 4px; transition: color 0.15s; line-height: 1; color: var(--muted); }
+.swap-btn:hover { color: var(--accent); }
+
+/* Middle — task content */
+.task-time { grid-area: time; align-self: center; font-size: 11px; color: var(--accent); font-family: 'Pangolin', cursive; padding: 0 10px; cursor: pointer; }
+.task-title { grid-area: title; align-self: center; font-size: 14px; font-weight: 400; line-height: 1.3; font-family: 'Pangolin', cursive; padding: 0 10px; cursor: pointer; }
+.task-desc { grid-area: desc; align-self: center; font-size: 12px; color: var(--muted); font-family: 'Pangolin', cursive; padding: 0 10px; cursor: pointer; }
+
+/* Right column */
+.task-xp { grid-area: xp; align-self: center; justify-self: center; font-size: 10px; font-family: 'Pangolin', cursive; color: var(--gold); font-weight: 700; padding: 2px 5px; background: rgba(255,215,0,0.08); border-radius: 8px; border: 1px solid rgba(255,215,0,0.2); white-space: nowrap; }
+
+.edit-btn { grid-area: edit; align-self: center; justify-self: center; background: none; border: none; color: var(--muted); font-size: 17px; cursor: pointer; padding: 4px; transition: color 0.15s; line-height: 1; }
+.edit-btn:hover { color: var(--accent); }
+
+.delete-btn { grid-area: del; align-self: center; justify-self: center; background: none; border: none; color: var(--muted); font-size: 17px; cursor: pointer; padding: 4px; transition: color 0.15s; line-height: 1; }
 .delete-btn:hover { color: var(--accent3); }
 
 /* NOTES PANEL */
@@ -279,6 +308,30 @@ main { position: relative; z-index: 1; padding: 1rem 1.25rem; max-width: 480px; 
     <div class="modal-btns">
       <button class="btn-secondary" onclick="closeNewWeek()">Cancel</button>
       <button class="btn-danger" onclick="doNewWeek()">Clear all tasks</button>
+    </div>
+  </div>
+</div>
+
+<!-- SWAP TASK MODAL -->
+<div class="overlay" id="swap-overlay">
+  <div class="modal">
+    <div class="modal-title">Move task to another day</div>
+    <p id="swap-task-name" style="font-size:13px;color:var(--accent);margin-bottom:1rem;font-family:'Pangolin',cursive;"></p>
+    <div class="modal-field">
+      <label>Move to</label>
+      <select id="swap-day-select">
+        <option value="1">Monday</option>
+        <option value="2">Tuesday</option>
+        <option value="3">Wednesday</option>
+        <option value="4">Thursday</option>
+        <option value="5">Friday</option>
+        <option value="6">Saturday</option>
+        <option value="0">Sunday</option>
+      </select>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-secondary" onclick="closeSwap()">Cancel</button>
+      <button class="btn-primary" onclick="doSwap()">Move</button>
     </div>
   </div>
 </div>
@@ -626,16 +679,13 @@ function renderTasks() {
           <path d="M1 5L4.5 8.5L11 1.5" stroke="#0a0a0f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
-      <div class="task-body" onclick="handleCheck(event,${currentDay},${i},${task.xp},this.previousElementSibling)">
-        <div class="task-time">${task.time}</div>
-        <div class="task-title">${toTitleCase(task.title)}</div>
-        ${task.sub ? `<div class="task-sub">${task.sub}</div>` : ''}
-      </div>
-      <div class="task-edit-wrap">
-        <div class="task-xp">+${task.xp}</div>
-        <button class="edit-btn" onclick="openEdit(event,${currentDay},${i})" title="Edit">✎</button>
-      </div>
       <button class="notes-btn ${note ? 'has-note' : ''}" onclick="openNotePanel(event,${i})" title="Notes">≡</button>
+      <button class="swap-btn" onclick="openSwap(event,${currentDay},${i})" title="Swap">⇄</button>
+      <div class="task-time" onclick="handleCheck(event,${currentDay},${i},${task.xp},this.closest('.task').querySelector('.task-check'))">${task.time}</div>
+      <div class="task-title" onclick="handleCheck(event,${currentDay},${i},${task.xp},this.closest('.task').querySelector('.task-check'))">${toTitleCase(task.title)}</div>
+      <div class="task-desc" onclick="handleCheck(event,${currentDay},${i},${task.xp},this.closest('.task').querySelector('.task-check'))">${task.sub || ''}</div>
+      <div class="task-xp">+${task.xp}</div>
+      <button class="edit-btn" onclick="openEdit(event,${currentDay},${i})" title="Edit">✎</button>
       <button class="delete-btn" onclick="confirmDeleteTask(event,${currentDay},${i})" title="Delete">✕</button>
     `;
 
@@ -821,6 +871,36 @@ function confirmDeleteNow() {
   saveState(state);
   closeDeleteConfirm();
   closeEdit();
+  openNotes = {};
+  renderAll();
+}
+
+function openSwap(e, dayIdx, taskIdx) {
+  e.stopPropagation();
+  editTarget = { dayIdx, taskIdx };
+  const task = SCHEDULE[dayIdx][taskIdx];
+  document.getElementById('swap-task-name').textContent = toTitleCase(task.title);
+  // Pre-select the next day in the week (Mon=1...Sun=0)
+  const order = [1,2,3,4,5,6,0];
+  const currentPos = order.indexOf(dayIdx);
+  const nextDay = order[(currentPos + 1) % 7];
+  document.getElementById('swap-day-select').value = nextDay;
+  document.getElementById('swap-overlay').classList.add('show');
+}
+function closeSwap() {
+  document.getElementById('swap-overlay').classList.remove('show');
+}
+function doSwap() {
+  if (!editTarget) return;
+  const { dayIdx, taskIdx } = editTarget;
+  const targetDay = parseInt(document.getElementById('swap-day-select').value);
+  if (targetDay === dayIdx) { closeSwap(); return; }
+  const task = SCHEDULE[dayIdx].splice(taskIdx, 1)[0];
+  if (!SCHEDULE[targetDay]) SCHEDULE[targetDay] = [];
+  SCHEDULE[targetDay].push(task);
+  sortTasks(targetDay);
+  saveSchedule();
+  closeSwap();
   openNotes = {};
   renderAll();
 }
