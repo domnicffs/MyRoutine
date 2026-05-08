@@ -197,6 +197,9 @@ main { padding: 1rem; max-width: 480px; margin: 0 auto; }
     <button class="btn-primary" onclick="openObImport()" style="flex:1">Import routine</button>
   </div>
   <div id="ob-import-area" style="display:none;width:100%;max-width:380px;margin-top:0.75rem;">
+    <button class="btn-secondary" onclick="document.getElementById('ob-file-input').click()" style="width:100%;margin-bottom:8px;">📁 Upload routine file</button>
+    <input type="file" id="ob-file-input" accept=".json" style="display:none" onchange="importRoutineFile(this)">
+    <div style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:8px;">— or paste JSON below —</div>
     <textarea id="ob-import-json" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Space Mono',monospace;font-size:10px;padding:0.75rem;resize:none;height:100px;outline:none;line-height:1.4;" placeholder="Paste your routine JSON here..."></textarea>
     <button class="btn-primary" onclick="importFromPasteOb()" style="width:100%;margin-top:6px;">Load routine</button>
   </div>
@@ -387,12 +390,18 @@ main { padding: 1rem; max-width: 480px; margin: 0 auto; }
 
     <!-- Export -->
     <div style="font-size:11px;color:var(--muted);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:6px;">Export current routine</div>
-    <button class="btn-secondary" onclick="exportAndCopy()" style="width:100%;">Copy JSON to clipboard</button>
+    <div style="display:flex;gap:8px;">
+      <button class="btn-secondary" onclick="exportAndCopy()" style="flex:1;">Copy JSON</button>
+      <button class="btn-secondary" onclick="exportAsFile()" style="flex:1;">Download file</button>
+    </div>
 
     <hr style="border-color:var(--border);margin:1rem 0;">
 
     <!-- Import -->
     <div style="font-size:11px;color:var(--muted);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:6px;">Import routine</div>
+    <button class="btn-secondary" onclick="document.getElementById('settings-file-input').click()" style="width:100%;margin-bottom:8px;">📁 Upload routine file</button>
+    <input type="file" id="settings-file-input" accept=".json" style="display:none" onchange="importRoutineFile(this)">
+    <div style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:8px;">— or paste JSON below —</div>
     <textarea id="import-json-area" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Space Mono',monospace;font-size:10px;padding:0.6rem;resize:none;height:80px;outline:none;line-height:1.4;" placeholder="Paste your routine JSON here..."></textarea>
     <button class="btn-primary" onclick="importFromPaste()" style="width:100%;margin-top:6px;">Import</button>
 
@@ -516,6 +525,15 @@ function startBlank() {
 
 
 // ── ROUTINES MANAGER ──
+function exportAsFile() {
+  const name = document.getElementById('save-routine-name').value.trim() || 'my_routine';
+  const obj = { version: 1, name, date: new Date().toLocaleDateString(), schedule: SCHEDULE };
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json' }));
+  a.download = name.replace(/\s+/g,'_') + '.json';
+  a.click();
+}
+
 function exportAndCopy() {
   const name = document.getElementById('save-routine-name').value.trim() || 'My Routine';
   const obj = { version: 1, name, date: new Date().toLocaleDateString(), schedule: SCHEDULE };
