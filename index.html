@@ -191,20 +191,15 @@ main { padding: 1rem; max-width: 480px; margin: 0 auto; }
 <div id="onboarding">
   <div class="ob-logo">⚡</div>
   <div class="ob-title">Daily Grind</div>
-  <div class="ob-sub">No routine yet. Describe your week in plain English and AI will build it for you — or just start blank and add tasks yourself.</div>
-  <textarea class="ob-textarea" id="ob-input" placeholder="e.g. I work Mon–Fri 2pm to 7pm, wake up at 10am, gym 4x a week, I want to read daily, go shopping on Saturdays..."></textarea>
+  <div class="ob-sub">Build your week, track your habits, level up every day.</div>
   <div class="ob-btns">
     <button class="btn-secondary" onclick="startBlank()" style="flex:1">Start blank</button>
-    <button class="btn-primary" onclick="generateRoutine()" style="flex:2">✦ Generate with AI</button>
+    <button class="btn-primary" onclick="openObImport()" style="flex:1">Import routine</button>
   </div>
-  <div style="display:flex;gap:8px;margin-top:0.75rem;width:100%;max-width:380px;">
-    <button class="btn-secondary" onclick="openObImport()" style="flex:1;font-size:12px;">Import routine</button>
-  </div>
-  <div id="ob-import-area" style="display:none;width:100%;max-width:380px;margin-top:0.5rem;">
+  <div id="ob-import-area" style="display:none;width:100%;max-width:380px;margin-top:0.75rem;">
     <textarea id="ob-import-json" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Space Mono',monospace;font-size:10px;padding:0.75rem;resize:none;height:100px;outline:none;line-height:1.4;" placeholder="Paste your routine JSON here..."></textarea>
     <button class="btn-primary" onclick="importFromPasteOb()" style="width:100%;margin-top:6px;">Load routine</button>
   </div>
-  <div class="ob-generating" id="ob-generating">✦ Building your routine...</div>
 </div>
 
 <!-- ── HEADER ── -->
@@ -379,7 +374,6 @@ main { padding: 1rem; max-width: 480px; margin: 0 auto; }
   <div class="modal">
     <div class="modal-title">Settings</div>
 
-    <!-- Save routine -->
     <div style="font-size:11px;color:var(--muted);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:6px;">Save current routine</div>
     <div style="display:flex;gap:8px;">
       <input type="text" id="save-routine-name" placeholder="Routine name" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--font);font-size:13px;padding:8px 10px;outline:none;">
@@ -520,76 +514,6 @@ function startBlank() {
   renderAll();
 }
 
-async function generateRoutine() {
-  const input = document.getElementById('ob-input').value.trim();
-  if (!input) { alert('Please describe your week first'); return; }
-  const gen = document.getElementById('ob-generating');
-  gen.style.display = 'block';
-  document.querySelectorAll('.ob-btns button').forEach(b => b.disabled = true);
-
-  try {
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        system: `You are a routine builder. The user describes their week in plain English.
-Return ONLY a valid JSON object — no explanation, no markdown, no backticks, nothing else.
-Structure: {"0":[],"1":[],"2":[],"3":[],"4":[],"5":[],"6":[]}
-Keys 0-6 are days (0=Sunday,1=Monday,2=Tuesday,3=Wednesday,4=Thursday,5=Friday,6=Saturday).
-Each task object: {"time":"HH:MM","title":"Task Name","sub":"short description","cat":"hygiene","xp":10}
-Cat must be one of: hygiene, trading, food, prep, work, workout, reading, chores, anime, haircare, shopping.
-XP: 5-20 based on effort. Keep tasks ordered by time. Max 12 tasks per day. Only return the JSON object.`,
-        messages: [{ role: 'user', content: input }]
-      })
-    });
-
-    if (!resp.ok) {
-      const err = await resp.text();
-      console.error('API response:', err);
-      throw new Error('API error ' + resp.status + ': ' + err.substring(0, 200));
-    }
-
-    const data = await resp.json();
-    console.log('API data:', JSON.stringify(data).substring(0, 500));
-
-    if (!data.content || !data.content.length) {
-      throw new Error('Empty response from API');
-    }
-
-    const text = data.content
-      .filter(c => c.type === 'text')
-      .map(c => c.text)
-      .join('');
-
-    if (!text) throw new Error('No text in response');
-
-    // Strip any markdown fences if present
-    const clean = text.replace(/^```json\s*/,'').replace(/^```\s*/,'').replace(/```\s*$/,'').trim();
-
-    const parsed = JSON.parse(clean);
-
-    // Validate it has at least some days
-    if (typeof parsed !== 'object' || Array.isArray(parsed)) {
-      throw new Error('Response is not a valid schedule object');
-    }
-
-    SCHEDULE = parsed;
-    // Ensure all days exist
-    [0,1,2,3,4,5,6].forEach(d => { if (!SCHEDULE[d]) SCHEDULE[d] = []; });
-    saveSchedule();
-    document.getElementById('onboarding').classList.remove('show');
-    renderAll();
-
-  } catch(e) {
-    console.error('Generate error:', e);
-    alert('Could not generate routine: ' + e.message + '\n\nTry again or start blank.');
-  } finally {
-    gen.style.display = 'none';
-    document.querySelectorAll('.ob-btns button').forEach(b => b.disabled = false);
-  }
-}
 
 // ── ROUTINES MANAGER ──
 function exportAndCopy() {
