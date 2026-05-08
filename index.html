@@ -197,8 +197,11 @@ main { padding: 1rem; max-width: 480px; margin: 0 auto; }
     <button class="btn-primary" onclick="openObImport()" style="flex:1">Import routine</button>
   </div>
   <div id="ob-import-area" style="display:none;width:100%;max-width:380px;margin-top:0.75rem;">
-    <button class="btn-secondary" onclick="document.getElementById('ob-file-input').click()" style="width:100%;">Upload routine file</button>
+    <button class="btn-secondary" onclick="document.getElementById('ob-file-input').click()" style="width:100%;margin-bottom:8px;">Upload routine file</button>
     <input type="file" id="ob-file-input" accept=".json" style="display:none" onchange="importRoutineFile(this)">
+    <div style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:8px;">— or paste JSON below —</div>
+    <textarea id="ob-import-json" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Space Mono',monospace;font-size:10px;padding:0.75rem;resize:none;height:100px;outline:none;line-height:1.4;" placeholder="Paste your routine JSON here..."></textarea>
+    <button class="btn-primary" onclick="importFromPasteOb()" style="width:100%;margin-top:6px;">Load routine</button>
   </div>
 </div>
 
@@ -338,18 +341,6 @@ main { padding: 1rem; max-width: 480px; margin: 0 auto; }
       </div>
     </div>
     <div class="modal-field">
-      <label>End Time <span style="color:var(--muted);font-size:10px;">(optional)</span></label>
-      <div style="display:flex;gap:8px;align-items:center;">
-        <select id="edit-hour-end" style="flex:1;text-align:center;font-size:16px;padding:8px 4px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--font);"></select>
-        <span style="color:var(--muted);font-size:16px;">:</span>
-        <select id="edit-min-end" style="flex:1;text-align:center;font-size:16px;padding:8px 4px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--font);"></select>
-        <select id="edit-end-toggle" style="flex:1;text-align:center;font-size:12px;padding:8px 4px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--font);">
-          <option value="no">No end</option>
-          <option value="yes">Use end</option>
-        </select>
-      </div>
-    </div>
-    <div class="modal-field">
       <label>Title</label>
       <input type="text" id="edit-title" placeholder="Task name">
     </div>
@@ -387,14 +378,20 @@ main { padding: 1rem; max-width: 480px; margin: 0 auto; }
 
     <!-- Export -->
     <div style="font-size:11px;color:var(--muted);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:6px;">Export current routine</div>
-    <button class="btn-secondary" onclick="exportAsFile()" style="width:100%;">Download file</button>
+    <div style="display:flex;gap:8px;">
+      <button class="btn-secondary" onclick="exportAsFile()" style="flex:1;">Download file</button>
+      <button class="btn-secondary" onclick="exportAndCopy()" style="flex:1;">Copy JSON</button>
+    </div>
 
     <hr style="border-color:var(--border);margin:1rem 0;">
 
     <!-- Import -->
     <div style="font-size:11px;color:var(--muted);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:6px;">Import routine</div>
-    <button class="btn-secondary" onclick="document.getElementById('settings-file-input').click()" style="width:100%;">Upload routine file</button>
+    <button class="btn-secondary" onclick="document.getElementById('settings-file-input').click()" style="width:100%;margin-bottom:8px;">Upload routine file</button>
     <input type="file" id="settings-file-input" accept=".json" style="display:none" onchange="importRoutineFile(this)">
+    <div style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:8px;">— or paste JSON below —</div>
+    <textarea id="import-json-area" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Space Mono',monospace;font-size:10px;padding:0.6rem;resize:none;height:80px;outline:none;line-height:1.4;" placeholder="Paste your routine JSON here..."></textarea>
+    <button class="btn-primary" onclick="importFromPaste()" style="width:100%;margin-top:6px;">Import</button>
 
     <hr style="border-color:var(--border);margin:1rem 0;">
 
@@ -495,6 +492,8 @@ if (!state.completedDays) state.completedDays = {};
 if (state.streakBase === undefined) state.streakBase = 0;
 
 let SCHEDULE = loadSchedule() || JSON.parse(JSON.stringify(EMPTY_SCHEDULE));
+cleanScheduleTimes();
+saveSchedule();
 let currentDay = new Date().getDay();
 let openNotes = {};
 let editTarget = null;
@@ -732,6 +731,19 @@ function importRoutineFile(input) {
 // ── UTILS ──
 function toTitleCase(str) { return str.replace(/\b\w/g, c => c.toUpperCase()); }
 
+function stripEndTime(timeStr) {
+  // Remove " – HH:MM" end time portion, keep only start
+  if (!timeStr) return timeStr;
+  return timeStr.replace(/\s*[–-]\s*\d{1,2}:\d{2}\s*$/, '').trim();
+}
+
+function cleanScheduleTimes() {
+  [0,1,2,3,4,5,6].forEach(d => {
+    if (!SCHEDULE[d]) return;
+    SCHEDULE[d].forEach(t => { t.time = stripEndTime(t.time); });
+  });
+}
+
 function getNoteKey(dayIdx, taskIdx) {
   const task = (SCHEDULE[dayIdx]||[])[taskIdx];
   if (!task) return `${dayIdx}_${taskIdx}`;
@@ -913,31 +925,23 @@ function saveNoteInput(dayIdx, taskIdx, el) { setNote(dayIdx, taskIdx, el.value)
 
 // ── TIME PICKERS ──
 function populateTimePickers() {
-  ['edit-hour-start','edit-hour-end'].forEach(id => {
+  ['edit-hour-start'].forEach(id => {
     const sel=document.getElementById(id); if(sel.options.length) return;
     for(let h=0;h<24;h++){ const o=document.createElement('option'); o.value=h; o.textContent=String(h).padStart(2,'0'); sel.appendChild(o); }
   });
-  ['edit-min-start','edit-min-end'].forEach(id => {
+  ['edit-min-start'].forEach(id => {
     const sel=document.getElementById(id); if(sel.options.length) return;
     for(let m=0;m<60;m++){ const o=document.createElement('option'); o.value=m; o.textContent=String(m).padStart(2,'0'); sel.appendChild(o); }
   });
 }
 function setTimePicker(timeStr) {
-  const parts=(timeStr||'10:00').replace('~','').split(/\s*[–-]\s*/);
-  const s=(parts[0]||'10:00').match(/(\d+):(\d+)/);
-  const en=parts[1]?parts[1].match(/(\d+):(\d+)/):null;
+  const t=(timeStr||'10:00').replace('~','').replace(/\s*[–-].*$/,'').trim();
+  const s=t.match(/(\d+):(\d+)/);
   if(s){ document.getElementById('edit-hour-start').value=parseInt(s[1]); document.getElementById('edit-min-start').value=parseInt(s[2]); }
-  if(en){ document.getElementById('edit-hour-end').value=parseInt(en[1]); document.getElementById('edit-min-end').value=parseInt(en[2]); document.getElementById('edit-end-toggle').value='yes'; }
-  else { document.getElementById('edit-end-toggle').value='no'; }
 }
 function getTimeFromPicker() {
   const hs=String(document.getElementById('edit-hour-start').value).padStart(2,'0');
   const ms=String(document.getElementById('edit-min-start').value).padStart(2,'0');
-  if(document.getElementById('edit-end-toggle').value==='yes'){
-    const he=String(document.getElementById('edit-hour-end').value).padStart(2,'0');
-    const me=String(document.getElementById('edit-min-end').value).padStart(2,'0');
-    return `${hs}:${ms} – ${he}:${me}`;
-  }
   return `${hs}:${ms}`;
 }
 
@@ -1020,8 +1024,6 @@ function doSwap(){
   const targetDay=parseInt(document.getElementById('swap-day-select').value);
   if(targetDay===dayIdx){closeSwap();return;}
   const task=SCHEDULE[dayIdx].splice(taskIdx,1)[0];
-  // Record original day if not already set
-  if(task.originalDay === undefined) task.originalDay = dayIdx;
   if(!SCHEDULE[targetDay]) SCHEDULE[targetDay]=[];
   SCHEDULE[targetDay].push(task);
   sortTasks(targetDay); saveSchedule(); closeSwap(); openNotes={}; renderAll();
@@ -1034,20 +1036,6 @@ function doReset(){
   state.streakBase = state.streak;
   state.done={};
   state.completedDays={};
-  // Move any swapped tasks back to their original day
-  [0,1,2,3,4,5,6].forEach(d => {
-    if (!SCHEDULE[d]) return;
-    const toMove = SCHEDULE[d].filter(t => t.originalDay !== undefined && t.originalDay !== d);
-    toMove.forEach(t => {
-      SCHEDULE[d] = SCHEDULE[d].filter(x => x !== t);
-      const orig = t.originalDay;
-      delete t.originalDay;
-      if (!SCHEDULE[orig]) SCHEDULE[orig] = [];
-      SCHEDULE[orig].push(t);
-    });
-  });
-  [0,1,2,3,4,5,6].forEach(d => sortTasks(d));
-  saveSchedule();
   saveState(state);
   closeReset();
   renderAll();
