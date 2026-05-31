@@ -249,6 +249,21 @@ main { padding: 1rem; max-width: 480px; margin: 0 auto; }
     </div>
   </div>
 
+  <!-- NOTEPAD -->
+  <div id="notepad-section" style="margin-bottom:0.85rem;">
+    <div onclick="toggleNotepad()" style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer;transition:border-color 0.2s;" id="notepad-header">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:15px;">📓</span>
+        <span style="font-size:13px;font-family:var(--font);">Notes</span>
+      </div>
+      <span id="notepad-arrow" style="color:var(--muted);font-size:13px;">▼</span>
+    </div>
+    <div id="notepad-body" style="display:none;background:var(--surface2);border:1px solid var(--border);border-top:none;border-radius:0 0 12px 12px;padding:0.75rem 1rem;">
+      <textarea id="notepad-input" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--font);font-size:13px;padding:0.6rem 0.75rem;resize:none;min-height:120px;outline:none;line-height:1.6;transition:border-color 0.2s;" oninput="saveNotepad()"></textarea>
+      <div style="font-size:10px;color:var(--muted);margin-top:4px;text-align:right;" id="notepad-saved"></div>
+    </div>
+  </div>
+
   <div id="tasks-container"></div>
   <div class="all-done" id="all-done">
     <div class="all-done-title">DAY COMPLETE 🏆</div>
@@ -259,8 +274,8 @@ main { padding: 1rem; max-width: 480px; margin: 0 auto; }
 <!-- RESET MODAL -->
 <div class="overlay" id="reset-overlay">
   <div class="modal">
-    <div class="modal-title">Reset ticks?</div>
-    <p style="font-size:13px;color:var(--muted);margin-bottom:1.25rem;line-height:1.5;">Clears all ticked boxes. XP, streak, notes and tasks are kept.</p>
+    <div class="modal-title" style="text-align:center;">Reset ticks?</div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:1.25rem;line-height:1.8;text-align:center;">Clears all ticked boxes.<br>XP, streak, notes and tasks are kept.</p>
     <div class="modal-btns">
       <button class="btn-secondary" onclick="closeReset()">Cancel</button>
       <button class="btn-danger" onclick="doReset()">Reset</button>
@@ -1083,6 +1098,28 @@ document.addEventListener('touchmove', function(e) {
 document.addEventListener('gesturestart', function(e) {
   e.preventDefault();
 });
+
+// ── NOTEPAD ──
+function toggleNotepad() {
+  const body = document.getElementById('notepad-body');
+  const arrow = document.getElementById('notepad-arrow');
+  const header = document.getElementById('notepad-header');
+  const isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : 'block';
+  arrow.textContent = isOpen ? '▼' : '▲';
+  header.style.borderRadius = isOpen ? '12px' : '12px 12px 0 0';
+  if (!isOpen) {
+    document.getElementById('notepad-input').value = localStorage.getItem('dg_notepad') || '';
+  }
+}
+
+function saveNotepad() {
+  const val = document.getElementById('notepad-input').value;
+  localStorage.setItem('dg_notepad', val);
+  const saved = document.getElementById('notepad-saved');
+  saved.textContent = 'Saved';
+  setTimeout(() => { saved.textContent = ''; }, 1500);
+}
 
 // ── INIT ──
 checkOnboarding();
